@@ -18,14 +18,15 @@ import main.config.DBConnect;
  */
 public class KhachHangRepository {
 
-    // CRUD 
+     // CRUD 
     // GET ALL 
     // Finish CRUD man hinh Khach hang 
     // Tao giao dien man hinh Nhan vien, Hoa don, Ban hang
     public ArrayList<KhachHang> getAll() {
         // B1: Tao cau SQL 
         String sql = """
-                     SELECT Ma,Id, Ten, TenDem, Ho, NgaySinh, Sdt, DiaChi, ThanhPho, QuocGia, MatKhau, trangthai
+                     SELECT Ma,Id, Ten, TenDem, Ho, NgaySinh, Sdt, 
+                     DiaChi, ThanhPho, QuocGia, MatKhau, trangthai, gioitinh
                      FROM XUONG_LEVEL1_DESKTOP.dbo.KhachHang;
                      """;
         // B2: Mo cong ket noi 
@@ -49,6 +50,7 @@ public class KhachHangRepository {
 //                kh.setId(rs.getInt("Id"));
                 kh.setId(rs.getInt(2));
                 kh.setMa(rs.getString(1));
+                kh.setGioiTinh(rs.getBoolean(13));
                 // Tu set cac truong con lai 
                 lists.add(kh);
             }

@@ -20,36 +20,38 @@ import lombok.ToString;
 @AllArgsConstructor // contrutor full tham so 
 @NoArgsConstructor // contrutor k tham so 
 @Getter
-@Setter 
-@ToString 
+@Setter
+@ToString
 @Builder // contructor tuy y tham so 
 public class KhachHang {
-    
+
     // entity => MAPPING 100% GIONG CSDL 
     // KHONG DUOC PHEP KHAI BAO BIEN HANG LOAT 
     // Liet ke cac thuoc tinh trong CSDL
     private Integer id;
-    
+
     private String ma;
-    
+
     private String ten;
-    
+
     private String tenDem;
-    
+
     private String ho;
-    
+
     private Date ngaySinh;
-    
+
     private String soDienThoai;
-    
+
     private String diaChi;
-    
+
     private String thanhPho;
-    
+
     private String quocGia;
-    
+
     private String matKhau;
-    
+
     private Integer trangThai;
-    
+
+    private Boolean gioiTinh;
+
 }
