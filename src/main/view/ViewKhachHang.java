@@ -40,6 +40,7 @@ public class ViewKhachHang extends javax.swing.JFrame {
         // for..each + lamda 
         lists.forEach(s -> dtm.addRow(new Object[]{
             index.getAndIncrement(), s.getMa(), s.getTen(), s.getSoDienThoai(),
+            s.getDiaChi(),
             s.getThanhPho(), s.getQuocGia(), s.getGioiTinh()
         }));
     }
@@ -220,20 +221,51 @@ public class ViewKhachHang extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void tbKhachHangMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbKhachHangMouseClicked
-
+        detailKhachHang(tbKhachHang.getSelectedRow());
     }//GEN-LAST:event_tbKhachHangMouseClicked
 
     private void btnSuaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSuaActionPerformed
-
+        int index = tbKhachHang.getSelectedRow();
+        KhachHang kh = repo.getAll().get(index);
+        repo.update(getFormData(), kh.getId());
+        showDataTable(repo.getAll());
     }//GEN-LAST:event_btnSuaActionPerformed
 
     private void btnXoaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnXoaActionPerformed
-
+        int index = tbKhachHang.getSelectedRow();
+        KhachHang kh = repo.getAll().get(index);
+        repo.remove(kh.getId()); // update trang thai => FK 
+        showDataTable(repo.getAll());
     }//GEN-LAST:event_btnXoaActionPerformed
 
     private void btnThemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemActionPerformed
-
+        repo.add(getFormData());
+        showDataTable(repo.getAll());
     }//GEN-LAST:event_btnThemActionPerformed
+
+    private void detailKhachHang(int index) {
+        KhachHang kh = repo.getAll().get(index);
+        txtDiaChi.setText(kh.getDiaChi());
+        txtMa.setText(kh.getMa());
+        txtDiaChi.setText(kh.getDiaChi());
+        txtSDT.setText(kh.getSoDienThoai());
+        rdNam.setSelected(kh.getGioiTinh());
+        rdNu.setSelected(!kh.getGioiTinh());
+    }
+
+    // Lay du lieu tu form 
+    private KhachHang getFormData() {
+        // builder 
+        KhachHang kh = KhachHang.builder()
+                .ten(txtTen.getText())
+                .diaChi(txtDiaChi.getText())
+                .gioiTinh(rdNam.isSelected())
+                .soDienThoai(txtSDT.getText())
+                .build();
+        // Tuong ung voi contructor khong tham so
+//        KhachHang kh1 = new KhachHang();
+        return kh;
+    }
 
     /**
      * @param args the command line arguments
@@ -266,10 +298,8 @@ public class ViewKhachHang extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ViewKhachHang().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new ViewKhachHang().setVisible(true);
         });
     }
 
