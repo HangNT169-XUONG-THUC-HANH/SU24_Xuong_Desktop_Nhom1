@@ -39,7 +39,7 @@ public class NhanVienResponse {
     private String sdt;
     
     private String diaChi;
-    
+        
     private String maChucVu;
     
     private String tenChucVu;
