@@ -4,18 +4,62 @@
  */
 package main.view;
 
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.swing.table.DefaultTableModel;
+import main.repository.HoaDonRepository;
+import main.repository.SanPhamChiTietRepository;
+import main.response.HoaDonResponse;
+import main.response.SanPhamChiTietResponse;
+
 /**
  *
  * @author hangnt
  */
 public class ViewBanHang extends javax.swing.JFrame {
 
+    private HoaDonRepository hoaDonRepository;
+
+    private SanPhamChiTietRepository sanPhamChiTietRepository;
+
+    private DefaultTableModel dtmHoaDon;
+
+    private DefaultTableModel dtmSanPham;
+
     /**
      * Creates new form ViewBanHang
      */
     public ViewBanHang() {
         initComponents();
+        hoaDonRepository = new HoaDonRepository();
+        sanPhamChiTietRepository = new SanPhamChiTietRepository();
+        dtmHoaDon = (DefaultTableModel) tbHoaDon.getModel();
+        dtmSanPham = (DefaultTableModel) tbSanPham.getModel();
 
+        showTableHoaDon(hoaDonRepository.getAllByStatus());
+        showTableSanPham(sanPhamChiTietRepository.getAll());
+    }
+
+    private void showTableSanPham(ArrayList<SanPhamChiTietResponse> lists) {
+        dtmSanPham.setRowCount(0);
+        AtomicInteger index = new AtomicInteger(1);
+        lists.forEach(s -> dtmSanPham.addRow(new Object[]{
+            index.getAndIncrement(), s.getMaSP(), s.getTenSP(),
+            s.getNamBaoHanh(),
+            s.getMoTa(),
+            s.getMoTa(),
+            s.getSoLuong(), s.getGiaBan(),
+            s.getTenNSX(), s.getTenDongSanPham()
+        }));
+    }
+
+    private void showTableHoaDon(ArrayList<HoaDonResponse> lists) {
+        dtmHoaDon.setRowCount(0);
+        AtomicInteger index = new AtomicInteger(1);
+        lists.forEach(s -> dtmHoaDon.addRow(new Object[]{
+            index.getAndIncrement(), s.getMa(), s.getMaNhanVien(),
+            s.getTenKhachHang(), s.getTongTien(), s.getTrangThai()
+        }));
     }
 
     /**
@@ -340,8 +384,6 @@ public class ViewBanHang extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(ViewBanHang.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
