@@ -4,10 +4,6 @@
  */
 package main.view;
 
-import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
-import javax.swing.table.DefaultTableModel;
-
 /**
  *
  * @author hangnt
@@ -19,9 +15,9 @@ public class ViewBanHang extends javax.swing.JFrame {
      */
     public ViewBanHang() {
         initComponents();
+
     }
 
-   
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -303,18 +299,20 @@ public class ViewBanHang extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnTaoHoaDonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTaoHoaDonActionPerformed
-      
+
     }//GEN-LAST:event_btnTaoHoaDonActionPerformed
 
     private void btnThanhToanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThanhToanActionPerformed
-        // Update trang thai hoa don + cac truong con lai 
+
     }//GEN-LAST:event_btnThanhToanActionPerformed
 
     private void tbSanPhamMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbSanPhamMouseClicked
-        
+
+
     }//GEN-LAST:event_tbSanPhamMouseClicked
 
     private void tbHoaDonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbHoaDonMouseClicked
+
     }//GEN-LAST:event_tbHoaDonMouseClicked
 
     /**
@@ -344,9 +342,12 @@ public class ViewBanHang extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new ViewBanHang().setVisible(true);
             }
