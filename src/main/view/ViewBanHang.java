@@ -6,6 +6,8 @@ package main.view;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.entity.HoaDon;
@@ -21,19 +23,19 @@ import main.response.SanPhamChiTietResponse;
  * @author hangnt
  */
 public class ViewBanHang extends javax.swing.JFrame {
-    
+
     private HoaDonRepository hoaDonRepository;
-    
+
     private SanPhamChiTietRepository sanPhamChiTietRepository;
-    
+
     private DefaultTableModel dtmHoaDon;
-    
+
     private DefaultTableModel dtmSanPham;
-    
+
     private DefaultTableModel dtmHoaDonChiTiet;
-    
+
     private Integer indexHoaDonSelected;
-    
+
     private HoaDonChiTietRepository hoaDonChiTietRepository;
 
     /**
@@ -44,17 +46,17 @@ public class ViewBanHang extends javax.swing.JFrame {
         hoaDonRepository = new HoaDonRepository();
         hoaDonChiTietRepository = new HoaDonChiTietRepository();
         sanPhamChiTietRepository = new SanPhamChiTietRepository();
-        
+
         dtmHoaDon = (DefaultTableModel) tbHoaDon.getModel();
         dtmSanPham = (DefaultTableModel) tbSanPham.getModel();
         dtmHoaDonChiTiet = (DefaultTableModel) tbHoaDonChiTiet.getModel();
-        
+
         showTableHoaDon(hoaDonRepository.getAllByStatus());
         showTableSanPham(sanPhamChiTietRepository.getAll());
-        
+
         indexHoaDonSelected = tbHoaDon.getSelectedRow(); // Lay ra dong ma dang chon trong bang hoa don
     }
-    
+
     private void showTableSanPham(ArrayList<SanPhamChiTietResponse> lists) {
         dtmSanPham.setRowCount(0);
         AtomicInteger index = new AtomicInteger(1);
@@ -67,16 +69,17 @@ public class ViewBanHang extends javax.swing.JFrame {
             s.getTenNSX(), s.getTenDongSanPham()
         }));
     }
-    
+
     private void showTableHoaDon(ArrayList<HoaDonResponse> lists) {
         dtmHoaDon.setRowCount(0);
         AtomicInteger index = new AtomicInteger(1);
+        // -> lamda exxpension
         lists.forEach(s -> dtmHoaDon.addRow(new Object[]{
             index.getAndIncrement(), s.getMa(), s.getMaNhanVien(),
             s.getTenKhachHang(), s.getTongTien(), s.getTrangThai()
         }));
     }
-    
+
     private void showTableHoaDonChiTiet(ArrayList<HoaDonChiTietResponse> lists) {
         dtmHoaDonChiTiet.setRowCount(0);
         AtomicInteger index = new AtomicInteger(1);
@@ -259,6 +262,11 @@ public class ViewBanHang extends javax.swing.JFrame {
                 "STT", "Mã SP", "Tên SP", "Số lượng", "Đơn giá", "Thành tiền"
             }
         ));
+        tbHoaDonChiTiet.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbHoaDonChiTietMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tbHoaDonChiTiet);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -384,7 +392,22 @@ public class ViewBanHang extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTaoHoaDonActionPerformed
 
     private void btnThanhToanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThanhToanActionPerformed
-
+        // B1: Update Hoa don 
+        HoaDonResponse response = hoaDonRepository.getAllByStatus().get(indexHoaDonSelected);
+        response.setTenKhachHang(txtNguoiNhan.getText());
+        response.setSdtNguoiNhan(txtSDT.getText());
+        response.setDiaChiNguoiNhan(txtDiaChi.getText());
+        // Update tt trong hoa don 
+        hoaDonRepository.updateThongTin(response);
+        // B2: Xoa all tt
+        showTableHoaDon(hoaDonRepository.getAllByStatus()); 
+        dtmHoaDonChiTiet.setRowCount(0);
+        txtDiaChi.setText("");
+        txtNgayTao.setText("");
+        txtSDT.setText("");
+        txtDiaChi.setText("");
+        txtNguoiNhan.setText("");
+        txtTongTien.setText("");
     }//GEN-LAST:event_btnThanhToanActionPerformed
 
     private void tbSanPhamMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbSanPhamMouseClicked
@@ -397,7 +420,12 @@ public class ViewBanHang extends javax.swing.JFrame {
         // add vao list hoa don chi tiet 
         // hien thi ra o input diglog de nguoi dung nhap gia tri vao 
         String soLuong = JOptionPane.showInputDialog("So luong la ", "0");
-
+        // Validate : Check so am , so luong qua trong kho 
+        // Cong don o doan nay
+        // Lay spctr so sanh toan bo sp trong hdct cua hoa don dang lua chon
+        // Neu ton tai roi => Cong don so luong
+        // Neu chua ton tai => Them ban ghi moi 
+        
         // Tao ra hoa don chi tiet
         HoaDonChiTietResponse hoaDonChiTietResponse
                 = HoaDonChiTietResponse.builder()
@@ -427,16 +455,54 @@ public class ViewBanHang extends javax.swing.JFrame {
         // load laij table hdct & table sp 
         showTableSanPham(sanPhamChiTietRepository.getAll());
         showTableHoaDonChiTiet(hoaDonChiTietRepository.getAll(response.getId()));
+
+        // cap nhat ben phai va tong tien trong table hoa don 
+        response.setTongTien(showTotalMoney(hoaDonChiTietRepository.getAll(response.getId())));
+        // Update tong tien vao CSDL 
+        hoaDonRepository.updateTongTien(response);
+        // set lai cac truong thong tin 
+        txtTongTien.setText(response.getTongTien()+"");
+        showTableHoaDon(hoaDonRepository.getAllByStatus());
     }//GEN-LAST:event_tbSanPhamMouseClicked
 
+    private double showTotalMoney(ArrayList<HoaDonChiTietResponse> lists) {
+        // C1: 
+//        double tongTien = 0;
+//        for (HoaDonChiTietResponse a : lists) {
+//            tongTien+=a.getThanhTien();
+//        }
+//        return tongTien;
+        // C2: Su dung stream => reduce 
+        // :: method reference
+//        return lists.stream()
+//                    .map(HoaDonChiTietResponse :: getThanhTien)
+//                    .reduce(0.0, Double::sum);
+        // collect 
+        return lists.stream()
+                .collect(Collectors.summingDouble(HoaDonChiTietResponse::getThanhTien));
+        // paralletStream
+    }
     private void tbHoaDonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbHoaDonMouseClicked
         indexHoaDonSelected = tbHoaDon.getSelectedRow();
-        // 
+        // B1: Load phia ben phai 
+        HoaDonResponse response = hoaDonRepository.getAllByStatus().get(indexHoaDonSelected);
+        txtDiaChi.setText(response.getDiaChiNguoiNhan());
+        txtNgayTao.setText(response.getNgayTao() + "");
+        txtNguoiNhan.setText(response.getTenKhachHang());
+        txtSDT.setText(response.getSdtNguoiNhan());
+        txtTongTien.setText(response.getTongTien() + "");
+        // load table hdct 
+        showTableHoaDonChiTiet(hoaDonChiTietRepository.getAll(response.getId()));
     }//GEN-LAST:event_tbHoaDonMouseClicked
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
         showTableSanPham(sanPhamChiTietRepository.search(txtSearch.getText()));
     }//GEN-LAST:event_btnSearchActionPerformed
+
+    private void tbHoaDonChiTietMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbHoaDonChiTietMouseClicked
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_tbHoaDonChiTietMouseClicked
 
     /**
      * @param args the command line arguments

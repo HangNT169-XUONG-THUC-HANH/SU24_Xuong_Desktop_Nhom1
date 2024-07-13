@@ -169,7 +169,7 @@ public class HoaDonRepository {
         return lists;
     }
 
-     public boolean add(HoaDon hoaDon) {
+    public boolean add(HoaDon hoaDon) {
 
         int check = 0;
 
@@ -186,6 +186,56 @@ public class HoaDonRepository {
             ps.setObject(4, new Date());
             ps.setObject(5, 0);
             ps.setObject(6, 0);
+
+            check = ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+        }
+
+        return check > 0;
+    }
+
+    public boolean updateTongTien(HoaDonResponse hoaDon) {
+
+        int check = 0;
+
+        String sql = """
+                    UPDATE XUONG_LEVEL1_DESKTOP.dbo.HoaDon
+                    SET  TongTien=?
+                    WHERE Id=?;
+                    """;
+        try (Connection con = DBConnect.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            // Object la cha cua cac loai kieu du lieu 
+            ps.setObject(1, hoaDon.getTongTien());
+            ps.setObject(2, hoaDon.getId()); // Nhan vien lay tu login
+
+            check = ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+        }
+
+        return check > 0;
+    }
+
+    public boolean updateThongTin(HoaDonResponse hoaDon) {
+
+        int check = 0;
+
+        String sql = """
+                     UPDATE XUONG_LEVEL1_DESKTOP.dbo.HoaDon
+                        SET  TinhTrang=1, 
+                            TenNguoiNhan=?,
+                            DiaChi=?, Sdt=?
+                    WHERE Id=?;
+                    """;
+        try (Connection con = DBConnect.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            // Object la cha cua cac loai kieu du lieu 
+            ps.setObject(1, hoaDon.getTenKhachHang());
+            ps.setObject(3, hoaDon.getSdtNguoiNhan()); // Nhan vien lay tu login
+            ps.setObject(2, hoaDon.getDiaChiNguoiNhan()); // Nhan vien lay tu login
+            ps.setObject(4, hoaDon.getId()); // Nhan vien lay tu login
 
             check = ps.executeUpdate();
         } catch (Exception e) {
